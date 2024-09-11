@@ -173,7 +173,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
 
   Widget _alphanumeric() {
     return Container(
-      height: height,
+      height: height + (customLayoutKeys.activeLayout.length * 2),
       width: width ?? MediaQuery.of(context).size.width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,7 +185,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
 
   Widget _numeric() {
     return Container(
-      height: height,
+      height: height + (customLayoutKeys.activeLayout.length * 2),
       width: width ?? MediaQuery.of(context).size.width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -264,7 +264,9 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
         _onKeyPress(key);
       },
       child: Container(
+        margin: EdgeInsets.all(1.0),
         height: height / customLayoutKeys.activeLayout.length,
+        decoration: BoxDecoration(color: Colors.white12),
         child: Center(
             child: Text(
           alwaysCaps
@@ -334,6 +336,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
             child: Container(
               height: double.infinity,
               width: double.infinity,
+              decoration: BoxDecoration(color: Colors.white12),
               child: Icon(
                 Icons.language,
                 color: textColor,
@@ -356,6 +359,8 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
       },
       child: Container(
         alignment: Alignment.center,
+        decoration: BoxDecoration(color: Colors.white12),
+        margin: EdgeInsets.all(1.0),
         height: height / customLayoutKeys.activeLayout.length,
         child: actionKey,
       ),
