@@ -1,5 +1,4 @@
 part of virtual_keyboard_multi_language;
-//import '../virtual_keyboard_multi_language.dart';
 
 abstract class VirtualKeyboardLayoutKeys {
   int activeIndex = 0;
@@ -17,6 +16,8 @@ abstract class VirtualKeyboardLayoutKeys {
     else
       activeIndex++;
   }
+
+  String get getLanguageCode;
 }
 
 class VirtualKeyboardDefaultLayoutKeys extends VirtualKeyboardLayoutKeys {
@@ -34,6 +35,17 @@ class VirtualKeyboardDefaultLayoutKeys extends VirtualKeyboardLayoutKeys {
       default:
     }
     return _defaultEnglishLayout;
+  }
+
+  String get getLanguageCode {
+    switch (defaultLayouts[activeIndex]) {
+      case VirtualKeyboardDefaultLayouts.English:
+        return 'en';
+      case VirtualKeyboardDefaultLayouts.German:
+        return 'de';
+      default:
+    }
+    return 'en';
   }
 }
 
