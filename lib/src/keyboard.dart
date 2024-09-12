@@ -45,6 +45,8 @@ class VirtualKeyboard extends StatefulWidget {
   /// will be ignored if customLayoutKeys is not null
   final List<VirtualKeyboardDefaultLayouts>? defaultLayouts;
 
+  final VirtualKeyboardDefaultLayouts defaultLanguage;
+
   VirtualKeyboard(
       {Key? key,
       required this.type,
@@ -58,7 +60,8 @@ class VirtualKeyboard extends StatefulWidget {
       this.height = _virtualKeyboardDefaultHeight,
       this.textColor = Colors.black,
       this.fontSize = 14,
-      this.alwaysCaps = false})
+      this.alwaysCaps = false,
+      this.defaultLanguage = VirtualKeyboardDefaultLayouts.English})
       : super(key: key);
 
   @override
@@ -135,6 +138,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
       textController = widget.textController ?? textController;
       customLayoutKeys = widget.customLayoutKeys ?? customLayoutKeys;
       // Init the Text Style for keys.
+      customLayoutKeys.changeLanguage(widget.defaultLanguage);
       textStyle = TextStyle(
         fontSize: fontSize,
         color: textColor,

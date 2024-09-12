@@ -17,6 +17,12 @@ abstract class VirtualKeyboardLayoutKeys {
       activeIndex++;
   }
 
+  void changeLanguage(VirtualKeyboardDefaultLayouts layout) {
+    if (layout == VirtualKeyboardDefaultLayouts.English)
+      activeIndex = 0;
+    else if (layout == VirtualKeyboardDefaultLayouts.German) activeIndex = 1;
+  }
+
   String get getLanguageCode;
 }
 
