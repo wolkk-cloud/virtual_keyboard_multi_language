@@ -337,9 +337,20 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
               height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(color: Colors.white12),
-              child: Icon(
-                Icons.language,
-                color: textColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.language,
+                    color: textColor,
+                  ),
+                  SizedBox(width: 5.0),
+                  Text(
+                    customLayoutKeys.getLanguageCode.toUpperCase(),
+                    style: TextStyle(color: textColor, fontSize: fontSize),
+                  )
+                ],
               ),
             ));
         break;
