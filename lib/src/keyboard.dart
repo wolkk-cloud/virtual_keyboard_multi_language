@@ -47,6 +47,8 @@ class VirtualKeyboard extends StatefulWidget {
 
   final VirtualKeyboardDefaultLayouts defaultLanguage;
 
+  final Function(String)? onSubmitted;
+
   VirtualKeyboard(
       {Key? key,
       required this.type,
@@ -61,7 +63,8 @@ class VirtualKeyboard extends StatefulWidget {
       this.textColor = Colors.black,
       this.fontSize = 14,
       this.alwaysCaps = false,
-      this.defaultLanguage = VirtualKeyboardDefaultLayouts.English})
+      this.defaultLanguage = VirtualKeyboardDefaultLayouts.English,
+      this.onSubmitted})
       : super(key: key);
 
   @override
@@ -83,6 +86,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
   late double fontSize;
   late bool alwaysCaps;
   late bool reverseLayout;
+  late Function(String)? onSubmitted;
   late VirtualKeyboardLayoutKeys customLayoutKeys;
   // Text Style for keys.
   late TextStyle textStyle;
@@ -101,7 +105,11 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
               textController.text.substring(0, textController.text.length - 1);
           break;
         case VirtualKeyboardKeyAction.Return:
-          textController.text += '\n';
+          if (onSubmitted == null) {
+            textController.text += '\n';
+          } else {
+            onSubmitted!(textController.text);
+          }
           break;
         case VirtualKeyboardKeyAction.Space:
           textController.text += (key.text ?? '');
@@ -129,6 +137,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
       type = widget.type;
       builder = widget.builder;
       onKeyPress = widget.onKeyPress;
+      onSubmitted = widget.onSubmitted;
       height = widget.height;
       width = widget.width;
       textColor = widget.textColor;
@@ -158,6 +167,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
             widget.defaultLayouts ?? [VirtualKeyboardDefaultLayouts.English]);
     builder = widget.builder;
     onKeyPress = widget.onKeyPress;
+    onSubmitted = widget.onSubmitted;
     height = widget.height;
     textColor = widget.textColor;
     fontSize = widget.fontSize;
