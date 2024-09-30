@@ -96,23 +96,22 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
 
   void _onKeyPress(VirtualKeyboardKey key) {
     if (key.keyType == VirtualKeyboardKeyType.String) {
-      textController.text += ((isShiftEnabled ? key.capsText : key.text) ?? '');
+      _textUpdateWithCursor(
+          inputText: (isShiftEnabled ? key.capsText : key.text) ?? '');
     } else if (key.keyType == VirtualKeyboardKeyType.Action) {
       switch (key.action) {
         case VirtualKeyboardKeyAction.Backspace:
-          if (textController.text.length == 0) return;
-          textController.text =
-              textController.text.substring(0, textController.text.length - 1);
+          _backSpaceUpdateWithCursor();
           break;
         case VirtualKeyboardKeyAction.Return:
           if (onSubmitted == null) {
-            textController.text += '\n';
+            _textUpdateWithCursor(inputText: "\n");
           } else {
-            onSubmitted!(textController.text);
+            onSubmitted?.call(textController.text);
           }
           break;
         case VirtualKeyboardKeyAction.Space:
-          textController.text += (key.text ?? '');
+          _textUpdateWithCursor(inputText: key.text ?? '');
           break;
         case VirtualKeyboardKeyAction.Shift:
           break;
@@ -121,6 +120,27 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
     }
 
     onKeyPress?.call(key);
+  }
+
+  void _backSpaceUpdateWithCursor() {
+    var cursorPos = textController.selection.base.offset;
+    if (cursorPos == 0) return;
+    if (textController.text.length == 0) return;
+    textController.text =
+        textController.text.replaceRange(cursorPos - 1, cursorPos, '');
+    textController.selection =
+        TextSelection.fromPosition(TextPosition(offset: cursorPos - 1));
+  }
+
+  void _textUpdateWithCursor({required String inputText}) {
+    var cursorPos = textController.selection.base.offset;
+    String textAfterCursor = textController.text.substring(cursorPos);
+
+    String textBeforeCursor = textController.text.substring(0, cursorPos);
+    textController.text = textBeforeCursor + inputText + textAfterCursor;
+
+    textController.selection =
+        TextSelection.fromPosition(TextPosition(offset: cursorPos + 1));
   }
 
   @override
