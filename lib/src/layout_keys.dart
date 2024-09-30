@@ -69,6 +69,8 @@ const List<List> _defaultEnglishLayout = [
     '8',
     '9',
     '0',
+    '-',
+    '=',
   ],
   // Row 2
   const [
@@ -111,7 +113,7 @@ const List<List> _defaultEnglishLayout = [
     'm',
     ',',
     '.',
-    '/',
+    '-',
     VirtualKeyboardKeyAction.Shift
   ],
   // Row 5
