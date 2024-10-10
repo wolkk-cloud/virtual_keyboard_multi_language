@@ -62,6 +62,9 @@ class VirtualKeyboard extends StatefulWidget {
   /// Return key options: new line, go, and hide keyboard.
   final VirtualKeyboardReturnKeyType returnKeyType;
 
+  /// Callback for text submitted event.
+  final Function(String)? onSubmitted;
+
   VirtualKeyboard({
     Key? key,
     required this.type,
@@ -80,6 +83,7 @@ class VirtualKeyboard extends StatefulWidget {
     this.onChange,
     this.backgroundColor = Colors.white,
     this.returnKeyType = VirtualKeyboardReturnKeyType.NewLine,
+    this.onSubmitted,
   }) : super(key: key);
 
   @override
@@ -87,19 +91,22 @@ class VirtualKeyboard extends StatefulWidget {
     return _VirtualKeyboardState();
   }
 
-  static void showKeyboard(
-    BuildContext context,
-    VirtualKeyboardType type, {
-    Function? onKeyPress,
-    TextEditingController? textController,
-    Function(String)? onChange,
-    Color backgroundColor = Colors.white,
-    Color textColor = Colors.black,
-    VirtualKeyboardReturnKeyType returnKeyType =
-        VirtualKeyboardReturnKeyType.NewLine,
-  }) {
+  static void showKeyboard(BuildContext context, VirtualKeyboardType type,
+      {Function? onKeyPress,
+      TextEditingController? textController,
+      Function(String)? onChange,
+      Function(String)? onSubmitted,
+      Color backgroundColor = Colors.white,
+      Color textColor = Colors.black,
+      VirtualKeyboardReturnKeyType returnKeyType =
+          VirtualKeyboardReturnKeyType.NewLine,
+      List<VirtualKeyboardDefaultLayouts>? defaultLayouts,
+      VirtualKeyboardDefaultLayouts defaultLanguage =
+          VirtualKeyboardDefaultLayouts.English}) {
     showModalBottomSheet(
       context: context,
+      barrierColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (BuildContext context) {
         return VirtualKeyboard(
           type: type,
@@ -109,6 +116,9 @@ class VirtualKeyboard extends StatefulWidget {
           backgroundColor: backgroundColor,
           textColor: textColor,
           returnKeyType: returnKeyType,
+          defaultLanguage: defaultLanguage,
+          defaultLayouts: defaultLayouts,
+          onSubmitted: onSubmitted,
         );
       },
     );
@@ -132,6 +142,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
   late bool alwaysCaps;
   late bool reverseLayout;
   late Function(String)? onChange;
+  late Function(String)? onSubmitted;
   late Color backgroundColor;
   late VirtualKeyboardReturnKeyType returnKeyType;
   late VirtualKeyboardLayoutKeys customLayoutKeys;
@@ -151,7 +162,8 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
           if (returnKeyType == VirtualKeyboardReturnKeyType.NewLine) {
             _textUpdateWithCursor(inputText: "\n");
           } else if (returnKeyType == VirtualKeyboardReturnKeyType.Go) {
-            onChange?.call(textController.text);
+            onSubmitted?.call(textController.text);
+            VirtualKeyboard.hideKeyboard(context);
           } else if (returnKeyType ==
               VirtualKeyboardReturnKeyType.HideKeyboard) {
             VirtualKeyboard.hideKeyboard(context);
@@ -195,8 +207,6 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
 
   @override
   dispose() {
-    if (widget.textController == null) // dispose if created locally only
-      textController.dispose();
     super.dispose();
   }
 
@@ -208,6 +218,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
       builder = widget.builder;
       onKeyPress = widget.onKeyPress;
       onChange = widget.onChange;
+      onSubmitted = widget.onSubmitted;
       height = widget.height;
       width = widget.width;
       textColor = widget.textColor;
@@ -239,6 +250,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
     builder = widget.builder;
     onKeyPress = widget.onKeyPress;
     onChange = widget.onChange;
+    onSubmitted = widget.onSubmitted;
     height = widget.height;
     textColor = widget.textColor;
     fontSize = widget.fontSize;
@@ -352,7 +364,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
   Widget _keyboardDefaultActionKey(VirtualKeyboardKey key) {
     Widget? actionKey;
 
-    switch (key.action ?? VirtualKeyboardKeyAction.SwithLanguage) {
+    switch (key.action ?? VirtualKeyboardKeyAction.SwitchLanguage) {
       case VirtualKeyboardKeyAction.Backspace:
         actionKey = GestureDetector(
             onLongPress: () {
@@ -391,7 +403,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
           color: textColor,
         );
         break;
-      case VirtualKeyboardKeyAction.SwithLanguage:
+      case VirtualKeyboardKeyAction.SwitchLanguage:
         actionKey = GestureDetector(
             onTap: () {
               setState(() {
