@@ -39,8 +39,8 @@ class VirtualKeyboardDefaultLayoutKeys extends VirtualKeyboardLayoutKeys {
       case VirtualKeyboardDefaultLayouts.German:
         return _defaultGermanLayout;
       default:
+        return _defaultEnglishLayout;
     }
-    return _defaultEnglishLayout;
   }
 
   String get getLanguageCode {
@@ -50,8 +50,8 @@ class VirtualKeyboardDefaultLayoutKeys extends VirtualKeyboardLayoutKeys {
       case VirtualKeyboardDefaultLayouts.German:
         return 'de';
       default:
+        return 'en';
     }
-    return 'en';
   }
 }
 
@@ -118,7 +118,7 @@ const List<List> _defaultEnglishLayout = [
   ],
   // Row 5
   const [
-    VirtualKeyboardKeyAction.SwithLanguage,
+    VirtualKeyboardKeyAction.SwitchLanguage,
     '@',
     VirtualKeyboardKeyAction.Space,
     '&',
@@ -190,7 +190,7 @@ const List<List> _defaultGermanLayout = [
   ],
   // Row 5
   [
-    VirtualKeyboardKeyAction.SwithLanguage,
+    VirtualKeyboardKeyAction.SwitchLanguage,
     '@',
     VirtualKeyboardKeyAction.Space,
     '&',
