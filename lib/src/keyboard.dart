@@ -6,6 +6,12 @@ const double _virtualKeyboardDefaultHeight = 300;
 
 const int _virtualKeyboardBackspaceEventPerioud = 250;
 
+enum VirtualKeyboardReturnKeyType {
+  NewLine,
+  Go,
+  HideKeyboard,
+}
+
 /// Virtual Keyboard widget.
 class VirtualKeyboard extends StatefulWidget {
   /// Keyboard Type: Should be inited in creation time.
@@ -49,6 +55,13 @@ class VirtualKeyboard extends StatefulWidget {
 
   final Function(String)? onSubmitted;
 
+  final VirtualKeyboardReturnKeyType returnKeyType;
+
+  final CustomKeyboardController customKeyboardController;
+
+  /// Callback for text change event.
+  final Function(String)? onChange;
+
   VirtualKeyboard(
       {Key? key,
       required this.type,
@@ -64,7 +77,10 @@ class VirtualKeyboard extends StatefulWidget {
       this.fontSize = 14,
       this.alwaysCaps = false,
       this.defaultLanguage = VirtualKeyboardDefaultLayouts.English,
-      this.onSubmitted})
+      this.onSubmitted,
+      required this.customKeyboardController,
+      this.onChange,
+      this.returnKeyType = VirtualKeyboardReturnKeyType.NewLine})
       : super(key: key);
 
   @override
@@ -104,10 +120,14 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
           _backSpaceUpdateWithCursor();
           break;
         case VirtualKeyboardKeyAction.Return:
-          if (onSubmitted == null) {
+          if (widget.returnKeyType == VirtualKeyboardReturnKeyType.NewLine) {
             _textUpdateWithCursor(inputText: "\n");
-          } else {
+          } else if (widget.returnKeyType == VirtualKeyboardReturnKeyType.Go) {
             onSubmitted?.call(textController.text);
+            widget.customKeyboardController.unfocus();
+          } else if (widget.returnKeyType ==
+              VirtualKeyboardReturnKeyType.HideKeyboard) {
+            widget.customKeyboardController.unfocus();
           }
           break;
         case VirtualKeyboardKeyAction.Space:
@@ -130,6 +150,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
         textController.text.replaceRange(cursorPos - 1, cursorPos, '');
     textController.selection =
         TextSelection.fromPosition(TextPosition(offset: cursorPos - 1));
+    widget.onChange?.call(textController.text);
   }
 
   void _textUpdateWithCursor({required String inputText}) {
@@ -141,6 +162,8 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
 
     textController.selection =
         TextSelection.fromPosition(TextPosition(offset: cursorPos + 1));
+
+    widget.onChange?.call(textController.text);
   }
 
   @override
@@ -401,6 +424,7 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
         }
 
         _onKeyPress(key);
+        widget.onChange?.call(textController.text);
       },
       child: Container(
         alignment: Alignment.center,
