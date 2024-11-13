@@ -22,7 +22,7 @@ const List<List> _keyRowsNumeric = [
   ],
   // Row 1
   const [
-    '.',
+    VirtualKeyboardKeyAction.Return,
     '0',
   ],
 ];
@@ -32,6 +32,11 @@ List<VirtualKeyboardKey> _getKeyboardRowKeysNumeric(rowNum) {
   // Generate VirtualKeyboardKey objects for each row.
   return List.generate(_keyRowsNumeric[rowNum].length, (int keyNum) {
     // Get key string value.
+    if (_keyRowsNumeric[rowNum][keyNum] is VirtualKeyboardKeyAction) {
+      var action = _keyRowsNumeric[rowNum][keyNum] as VirtualKeyboardKeyAction;
+      return VirtualKeyboardKey(
+          keyType: VirtualKeyboardKeyType.Action, action: action);
+    }
     String key = _keyRowsNumeric[rowNum][keyNum];
 
     // Create and return new VirtualKeyboardKey object.
