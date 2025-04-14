@@ -140,6 +140,11 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
     }
 
     onKeyPress?.call(key);
+    // Ensure no selection is active after key press
+    if (textController.selection.isCollapsed == false) {
+      final int cursorPos = textController.selection.end;
+      textController.selection = TextSelection.collapsed(offset: cursorPos);
+    }
   }
 
   void _backSpaceUpdateWithCursor() {
@@ -148,22 +153,66 @@ class _VirtualKeyboardState extends State<VirtualKeyboard> {
     if (textController.text.length == 0) return;
     textController.text =
         textController.text.replaceRange(cursorPos - 1, cursorPos, '');
-    textController.selection =
-        TextSelection.fromPosition(TextPosition(offset: cursorPos - 1));
+    textController.selection = TextSelection.collapsed(offset: cursorPos - 1);
     widget.onChange?.call(textController.text);
+
+    // Add a short delay to ensure selection is cleared
+    Future.delayed(Duration.zero, () {
+      if (textController.selection.isCollapsed == false) {
+        final int cursorPos = textController.selection.end;
+        textController.selection = TextSelection.collapsed(offset: cursorPos);
+      }
+    });
   }
 
   void _textUpdateWithCursor({required String inputText}) {
-    var cursorPos = textController.selection.base.offset;
-    String textAfterCursor = textController.text.substring(cursorPos);
+    // Get current selection
+    final TextSelection selection = textController.selection;
 
-    String textBeforeCursor = textController.text.substring(0, cursorPos);
-    textController.text = textBeforeCursor + inputText + textAfterCursor;
+    // Handle invalid selection
+    if (selection.baseOffset < 0) {
+      // No valid cursor position, append to the end
+      textController.text = textController.text + inputText;
+      textController.selection =
+          TextSelection.collapsed(offset: textController.text.length);
+    }
+    // Handle text selection (replace selected text)
+    else if (!selection.isCollapsed) {
+      // If text is selected, replace the selected text
+      final String textBefore =
+          textController.text.substring(0, selection.start);
+      final String textAfter = textController.text.substring(selection.end);
 
-    textController.selection =
-        TextSelection.fromPosition(TextPosition(offset: cursorPos + 1));
+      // Replace the selected text with input text
+      textController.text = textBefore + inputText + textAfter;
+
+      // Position cursor after the inserted text
+      textController.selection =
+          TextSelection.collapsed(offset: textBefore.length + inputText.length);
+    }
+    // Handle cursor position (no selection)
+    else {
+      final int cursorPos = selection.baseOffset;
+      final String textBefore = textController.text.substring(0, cursorPos);
+      final String textAfter = textController.text.substring(cursorPos);
+
+      // Insert text at cursor position
+      textController.text = textBefore + inputText + textAfter;
+
+      // Position cursor after the inserted text
+      textController.selection =
+          TextSelection.collapsed(offset: cursorPos + inputText.length);
+    }
 
     widget.onChange?.call(textController.text);
+
+    // Add a short delay to ensure selection is cleared
+    Future.delayed(Duration.zero, () {
+      if (textController.selection.isCollapsed == false) {
+        final int cursorPos = textController.selection.end;
+        textController.selection = TextSelection.collapsed(offset: cursorPos);
+      }
+    });
   }
 
   @override
